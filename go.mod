@@ -5,16 +5,19 @@ go 1.23.3
 require (
 	github.com/alexandrevicenzi/go-sse v1.6.0
 	github.com/felixge/fgprof v0.9.5
+	github.com/felixge/pprofutils v1.0.4
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/go-playground/validator/v10 v10.22.1
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/goccy/go-json v0.10.3
-	github.com/google/pprof v0.0.0-20241101162523-b92577c0c142
+	github.com/google/pprof v0.0.0-20250403155104-27863c87afa6
 	github.com/gorilla/mux v1.8.1
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/labstack/gommon v0.4.2
+	github.com/mark3labs/mcp-go v0.17.0
+	github.com/percona/go-mysql v0.0.0-20250402095632-a74727b12b16
 	go.etcd.io/bbolt v1.3.11
 	golang.org/x/sync v0.8.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -31,6 +34,7 @@ require (
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
@@ -41,6 +45,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/ianlancetaylor/demangle v0.0.0-20240312041847-bd984b5ce465 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -53,6 +58,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
+	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
 	github.com/skeema/knownhosts v1.2.2 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
@@ -60,6 +66,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
+	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/mod v0.12.0 // indirect

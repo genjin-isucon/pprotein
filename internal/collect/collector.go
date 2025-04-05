@@ -138,6 +138,19 @@ func (c *Collector) List() []*Entry {
 	return resp
 }
 
+func (c *Collector) ListByGroupID(groupID string) []*Entry {
+    c.mu.RLock()
+    defer c.mu.RUnlock()
+
+    var result []*Entry
+    for _, ent := range c.data {
+        if ent.Snapshot.GroupId == groupID {
+            result = append(result, ent)
+        }
+    }
+    return result
+}
+
 func (c *Collector) Collect(target *SnapshotTarget) error {
 	if target.URL == "" || target.Duration == 0 {
 		return fmt.Errorf("URL and Duration cannot be nil")

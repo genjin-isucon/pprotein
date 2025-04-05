@@ -1,0 +1,8 @@
+# テストデータのバイナリファイルはGitに含めない
+*.pprof
+*.pb.gz
+
+# 以下のファイルは除外しない（必要に応じてコメントアウト）
+# !profile.pb.gz
+# !sample_cpu.pprof
+# !sample_heap.pprof
