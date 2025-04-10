@@ -140,3 +140,52 @@ func (cl *Collector) makeInternalRequest(grpId string, target CollectTarget) err
 	}
 	return nil
 }
+
+func (cl *Collector) getGroupData(c echo.Context) error {
+	groupID := c.Param("group_id")
+	if groupID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "group_id is required")
+	}
+
+	result := map[string]interface{}{
+		"group_id": groupID,
+		"data":     map[string][]*collect.Entry{},
+	}
+
+	endpoints := []string{"pprof", "httplog", "slowlog", "memo"}
+
+	for _, endpoint := range endpoints {
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost:%s/api/%s", cl.port, endpoint), nil)
+		if err != nil {
+			continue
+		}
+
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			continue
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			continue
+		}
+
+		var entries []*collect.Entry
+		if err := json.NewDecoder(resp.Body).Decode(&entries); err != nil {
+			continue
+		}
+
+		var filteredEntries []*collect.Entry
+		for _, entry := range entries {
+			if entry.Snapshot.GroupId == groupID {
+				filteredEntries = append(filteredEntries, entry)
+			}
+		}
+
+		if len(filteredEntries) > 0 {
+			result["data"].(map[string][]*collect.Entry)[endpoint] = filteredEntries
+		}
+	}
+
+	return c.JSON(http.StatusOK, result)
+}

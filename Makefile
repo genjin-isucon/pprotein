@@ -9,6 +9,10 @@ run:
 run-agent:
 	go run ./cli/pprotein-agent
 
+.PHONY: run-binary
+run-binary:
+	./pprotein
+
 .PHONY: build
 build: pprotein pprotein-agent
 

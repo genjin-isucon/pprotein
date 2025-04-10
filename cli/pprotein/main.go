@@ -1,26 +1,66 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/kaz/pprotein/integration/echov4"
 	"github.com/kaz/pprotein/internal/collect"
 	"github.com/kaz/pprotein/internal/collect/group"
 	"github.com/kaz/pprotein/internal/event"
 	"github.com/kaz/pprotein/internal/extproc/alp"
 	"github.com/kaz/pprotein/internal/extproc/slp"
+	"github.com/kaz/pprotein/internal/mcp"
 	"github.com/kaz/pprotein/internal/memo"
-	"github.com/kaz/pprotein/internal/pprof"
+	pprofcollect "github.com/kaz/pprotein/internal/pprof"
 	"github.com/kaz/pprotein/internal/storage"
 	"github.com/kaz/pprotein/view"
 	"github.com/labstack/echo/v4"
 )
 
+// MCP request structure
+type MCPRequest struct {
+	Function  string                 `json:"function"`
+	Arguments map[string]interface{} `json:"arguments"`
+}
+
+// MCP response structure
+type MCPResponse struct {
+	Result interface{} `json:"result"`
+	Error  *MCPError   `json:"error,omitempty"`
+}
+
+// MCP error structure
+type MCPError struct {
+	Type    string `json:"type"`
+	Message string `json:"message"`
+}
+
+// For storing MySQL connection information
+type MySQLConnection struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+	Database string
+}
+
+// MCP server settings
+func setupMCP(mcpPort string, apiPort string) {
+	mcp.SetupMCP(mcpPort, apiPort)
+}
+
 func start() error {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "9000"
+	}
+
+	mcpPort := os.Getenv("MCP_PORT")
+	if mcpPort == "" {
+		mcpPort = "9001"
 	}
 
 	store, err := storage.New("data")
@@ -53,7 +93,7 @@ func start() error {
 		Store:    store,
 		EventHub: hub,
 	}
-	if err := pprof.NewHandler(pprofOpts).Register(api.Group("/pprof")); err != nil {
+	if err := pprofcollect.NewHandler(pprofOpts).Register(api.Group("/pprof")); err != nil {
 		return err
 	}
 
@@ -101,6 +141,36 @@ func start() error {
 	}
 	grp.RegisterHandlers(api.Group("/group"))
 
+	// Call setupMCP first and start the MCP server on a separate port
+	setupMCP(mcpPort, port)
+
+	// Implementation of a simple deletion endpoint
+	api.DELETE("/data/:type/:id", func(c echo.Context) error {
+		dataType := c.Param("type")
+		id := c.Param("id")
+
+		// Delete metadata from KV store
+		if err := store.Delete(dataType, id); err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{
+				"error": err.Error(),
+			})
+		}
+
+		// Also delete the file (if it exists)
+		path, _ := store.GetFilePath(id)
+		os.Remove(path) // Ignore error (file may not exist)
+
+		return c.JSON(http.StatusOK, map[string]string{
+			"status": "deleted",
+			"type":   dataType,
+			"id":     id,
+		})
+	})
+
+	// Display MCP port in server startup log as well
+	log.Printf("Starting pprotein server on port %s, MCP server on port %s", port, mcpPort)
+
+	// Start the main Echo server
 	return e.Start(":" + port)
 }
 
